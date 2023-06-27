@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ccww.aiotlab.mapper.CategoryMapper">
+
+    <resultMap id="categoryFontsVoMap" type="com.ccww.aiotlab.entity.vo.CategoryFontsVo">
+        <id property="id" jdbcType="INTEGER" column="cid"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <collection property="competitions" ofType="com.ccww.aiotlab.entity.Competition">
+            <id property="id" jdbcType="INTEGER" column="id"/>
+            <result property="title" jdbcType="VARCHAR" column="title"/>
+        </collection>
+    </resultMap>
+
+    <select id="fontsList" resultMap="categoryFontsVoMap">
+        SELECT ca.id AS cid,ca.name,co.id,co.title
+        FROM category AS ca
+        JOIN competition AS co
+        ON ca.name=co.category_name
+    </select>
+
+</mapper>

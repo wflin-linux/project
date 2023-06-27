@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>aiot实验室后台管理</title>
+    <link rel="stylesheet" href="/layui/css/layui.css">
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo layui-hide-xs layui-bg-black">aiot实验室</div>
+        <!-- 头部区域（可配合layui 已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left">
+            <!-- 移动端显示 -->
+            <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
+                <i class="layui-icon layui-icon-spread-left"></i>
+            </li>
+        </ul>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item layui-hide layui-show-md-inline-block">
+                <a href="javascript:;">
+                    <img src="//tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg" class="layui-nav-img">
+                    tester
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="#" id="logout">退出登录</a></dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                <li class="layui-nav-item" style="margin-top: 5%"><a href="/html/back/back-user-admin.html">用户管理</a></li>
+                <li class="layui-nav-item"><a href="/html/back/back-register-admin.html">注册管理</a></li>
+                <li class="layui-nav-item">
+                    <a href="/html/back/back-match-admin.html">比赛管理</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="/html/back/back-match-add-admin.html">添加比赛公告</a></dd>
+                        <dd class="layui-this"><a href="/html/back/back-match-category-admin.html">类别管理</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a href="javascript:;" style="background-color: #009688;">公告管理</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="/html/back/back-notice-add-admin.html">添加公告</a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-body">
+        <!-- 内容主体区域 -->
+        <div style="padding: 15px;">
+            <table class="layui-hide" id="main-info" lay-filter="main-info"></table>
+        </div>
+    </div>
+</div>
+
+
+
+<!--<a class="layui-btn layui-btn-xs" lay-event="view">查看</a>-->
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<script src="/layui/layui.js"></script>
+<script src="/js/jquery-3.6.0.min.js"></script>
+
+<!--表格数据-->
+<script>
+    layui.use('table', function(){
+        var table = layui.table;
+
+        table.render({
+            elem: '#main-info'
+            // ,url:'https://www.layuiweb.com/test/table/demo1.json.js'/*tpa=https://www.layuiweb.com/test/table/demo1.json*/
+            ,url: '/announce' //数据接口
+            ,headers: {token: localStorage.getItem("token")}
+            ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            ,defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                ,layEvent: 'LAYTABLE_TIPS'
+                ,icon: 'layui-icon-tips'
+            }]
+            ,title: '用户数据表'
+            ,cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                ,{field:'id', title:'ID', width:80, fixed: 'left', unresize: true, sort: true}
+                ,{field: 'realname', title: '真实姓名',templet: function (res) {
+                        return res.user.realName;
+                    }, width:100}
+                ,{field: 'content', title: '公告内容',templet: function (res) {
+                        return res.announcementContent.content;
+                    }, width:300}
+                ,{field: 'createTime', title: '创建时间', width:200}
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:80}
+            ]]
+            ,page: true
+        });
+
+        //监听行工具事件
+        table.on('tool(main-info)', function(obj){
+            var data = obj.data;
+            console.log(obj)
+            if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    obj.del();
+                    layer.close(index);
+                    $.ajax({
+                        type: "DELETE",
+                        url: "/announce?id="+data.id,
+                        headers: {token: localStorage.getItem("token")},
+                        dataType: "json",
+                        success: function(data){
+                            if(data.code == 200){
+                                table.reloadData("main-info", {
+                                    scrollPos: 'fixed'  // 保持滚动条位置不变 - v2.7.3 新增
+                                });
+                            }
+                        }
+                    });
+                });
+            } else if(obj.event === 'view'){
+                var data = obj.data
+                layer.alert(JSON.stringify(data));
+            }
+        });
+    });
+</script>
+
+<!--新增-->
+<script>
+    layui.use('table', function() {
+        var table = layui.table;
+    //头工具栏事件
+    table.on('toolbar(main-info)', function(obj){
+        switch(obj.event){
+            case 'addAnnouncement':
+            {
+            // 弹出框处理
+            layer.open({
+                type:1   // 模态框
+                ,title:'新增公告' // 不显示标题栏
+                ,closeBtn:false
+                ,area: ["800px","500px"]  // 宽和高
+                ,shade: 0.5
+                ,id:'LAY_layuipro' //设定一个 id,防止重复弹出
+                ,btn:['新增','取消']
+                ,btnAlign:'c' // 位置居中
+                ,moveType:1  // 拖拽模式，0或者1
+                ,content: $('#insert_form').html()  // 引入自定义表单
+                ,btn1:function (index,layero) {     // 这个新增按钮点击事件
+                    let announcememt = $('#announcememt').val();
+                    if (announcememt == ''||announcememt == null){
+                        layer.msg('没有数据无法新增', {icon: 5});
+                        return;
+                    }
+                    $.ajax({
+                        url:'/announce',
+                        type:'post',
+                        headers: {token: localStorage.getItem("token")},
+                        cache:false,
+                        contentType:"application/json;charset=utf-8",
+                        data:JSON.stringify({
+                            announcementContent:{
+                                content:announcememt,
+                            },
+                            announcementImageList:[]
+                        }),
+                        dataType:"json",
+                        success:function (response) {
+                            console.log("返回："+response)
+                            if (response.code===200){
+                                layer.msg("新增用户成功")
+                                layer.close(index)
+                            }
+                        },
+                        error:function (response) {
+                            console.log("出错返回："+response)
+                        }
+                    })
+                },
+                btn2: function(index, layero){
+                    layer.close();
+                },
+                cancel: function(layero,index){
+                    layer.closeAll();
+                }
+                ,success:function (layero) {
+
+                }
+            })
+            }
+        };
+    });
+})
+
+</script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ccww.aiotlab.mapper.AnnouncementMapper">
+
+    <resultMap id="BaseResultMap" type="com.ccww.aiotlab.entity.Announcement">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="cuId" column="cu_id" jdbcType="INTEGER"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapVo" type="com.ccww.aiotlab.entity.vo.AnnouncementVo">
+        <id property="id" column="a_id" jdbcType="INTEGER"/>
+        <result property="cuId" column="a_cu_id" jdbcType="INTEGER"/>
+        <result property="createTime" column="a_create_time" jdbcType="TIMESTAMP"/>
+        <association property="user" javaType="com.ccww.aiotlab.entity.User">
+            <id property="id" column="u_id" />
+            <result property="userName" column="u_user_name"/>
+            <result property="realName" column="u_real_name"/>
+        </association>
+        <association property="announcementContent" javaType="com.ccww.aiotlab.entity.AnnouncementContent">
+            <id property="id" column="a_con_id"/>
+            <result property="announceId" column="a_con_announce_id"/>
+            <result property="content" column="a_con_content"/>
+        </association>
+        <collection property="announcementImageList" javaType="java.util.List" ofType="com.ccww.aiotlab.entity.AnnouncementImage">
+            <id property="id" column="a_img_id"/>
+            <result property="imgPath" column="a_img_img_path"/>
+            <result property="announceId" column="a_img_announce_id"/>
+        </collection>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,cu_id,delete_time,
+        du_id,create_time
+    </sql>
+
+    <sql id="announcementVo">
+        a.id as a_id,
+        a.cu_id as a_cu_id,
+        a.create_time as a_create_time,
+
+        u.id as u_id,
+        u.user_name as u_user_name,
+        u.real_name as u_real_name,
+        u.email as u_email,
+
+        a_con.id as a_con_id,
+        a_con.announce_id as a_con_announce_id,
+        a_con.content as a_con_content,
+
+        a_img.id as a_img_id,
+        a_img.img_path as a_img_img_path,
+        a_img.announce_id as a_img_announce_id
+    </sql>
+    <select id="selectAllPage" resultMap="BaseResultMapVo">
+        select
+        <include refid="announcementVo"/>
+        from
+        announcement a
+        left join user u on u.id=a.cu_id
+        left join announcement_content a_con on a_con.announce_id=a.id
+        left join announcement_image a_img on a_img.announce_id=a.id
+        ORDER BY a_create_time DESC
+    </select>
+
+</mapper>

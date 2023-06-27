@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>aiot实验室后台管理</title>
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <!-- 引入editormd样式文件 -->
+    <link rel="stylesheet" href="/editormd/css/editormd.css" >
+    <style>
+        .row {
+            padding: 2em 2em 2.5em;
+            background-color: #F1F1F1;
+        }
+        .page-title {
+            position: relative;
+        }
+        .clearfix:before {
+            display: table;
+            content: " ";
+        }
+        .clearfix:after {
+            display: table;
+            content: " ";
+            clear: both;
+        }
+        .title .layui-form-label {
+            width: 50px;
+            padding: 9px;
+            text-align: center;
+        }
+        .title .layui-input-block {
+            margin-left: 70px;
+        }
+        .title .layui-input-block .layui-input {
+            width: 30%;
+        }
+        .title, .selector {
+            float: left;
+        }
+        .title .layui-input-block .layui-input {
+            width: 350px;
+        }
+        .selector {
+            width: 300px;
+        }
+        .selector .layui-form-label {
+            width: 120px;
+        }
+        .selector .layui-input-block {
+            margin-left: 150px;
+        }
+        .selector .form-select {
+            display: block;
+            width: 100%;
+            padding-left: 10px;
+            height: 38px;
+            line-height: 1.3;
+            border-color: #eee;
+            border-width: 1px;
+            border-style: solid;
+            background-color: #fff;
+            color: rgba(0,0,0,.85);
+            border-radius: 2px;
+            cursor: pointer;
+            outline: 0;
+            /*-webkit-appearance: none;*/
+            transition: all .3s;
+            -webkit-transition: all .3s;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo layui-hide-xs layui-bg-black">aiot实验室</div>
+        <!-- 头部区域（可配合layui 已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left">
+            <!-- 移动端显示 -->
+            <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
+                <i class="layui-icon layui-icon-spread-left"></i>
+            </li>
+        </ul>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item layui-hide layui-show-md-inline-block">
+                <a href="javascript:;">
+                    <img src="//tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg" class="layui-nav-img">
+                    tester
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="#" id="logout">退出登录</a></dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                <li class="layui-nav-item" style="margin-top: 5%"><a href="/html/back/back-user-admin.html">用户管理</a></li>
+                <li class="layui-nav-item"><a href="/html/back/back-register-admin.html">注册管理</a></li>
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a href="/html/back/back-match-admin.html">比赛管理</a>
+                    <dl class="layui-nav-child">
+                        <dd class="layui-this"><a href="/html/back/back-match-add-admin.html">添加比赛公告</a></dd>
+                        <dd><a href="/html/back/back-match-category-admin.html">类别管理</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="/html/back/back-notice-admin.html">公告管理</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="/html/back/back-notice-add-admin.html">添加公告</a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-body">
+        <!-- 内容主体区域 -->
+        <div style="padding: 15px;">
+            <div class="row">
+                <form method="post" class="add-article-form">
+                    <input type="hidden" id="mid">
+                    <div class="col-md-12">
+                        <h1 class="page-header" style="margin-bottom: 15px">撰写比赛公告</h1>
+                        <div class="page-title">
+                            <div class="title">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">标题</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" id="title" name="title" lay-verify="title" required autofocus autocomplete="off" placeholder="请输入标题" class="layui-input">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="selector">
+                                <label class="layui-form-label">比赛类别选择框</label>
+                                <div class="layui-input-block">
+                                    <select id="categories" class="form-select">
+<!--                                        <option value=""></option>-->
+<!--                                        <option value="0">写作</option>-->
+<!--                                        <option value="1" selected="">阅读</option>-->
+<!--                                        <option value="2">游戏</option>-->
+<!--                                        <option value="3">音乐</option>-->
+<!--                                        <option value="4">旅行</option>-->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <button type="button" class="layui-btn" id="uploadFile" style="margin-bottom: 15px">
+                            <i class="layui-icon">&#xe67c;</i>上传文件
+                        </button>
+                        <div id="test-editor">
+                            <textarea name="content" id="content" style="display:none;"></textarea>
+                        </div>
+                        <div class="layui-btn-container">
+                            <button type="button" class="layui-btn layui-btn-normal layui-btn-radius" onclick="publish()">发布</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/jquery-3.6.0.min.js"></script>
+<script src="/layui/layui.js"></script>
+<script src="/editormd/editormd.js"></script>
+<script>
+
+    let ids = [];
+    //JS
+    layui.use(['upload', 'element', 'layer', 'util'], function(){
+        var element = layui.element
+            ,upload = layui.upload
+            ,layer = layui.layer
+            ,util = layui.util
+            ,$ = layui.$;
+
+        //头部事件
+        util.event('lay-header-event', {
+            //左侧菜单事件
+            menuLeft: function(othis){
+                layer.msg('展开左侧菜单的操作', {icon: 0});
+            }
+            ,menuRight: function(){
+                layer.open({
+                    type: 1
+                    ,content: '<div style="padding: 15px;">处理右侧面板的操作</div>'
+                    ,area: ['260px', '100%']
+                    ,offset: 'rt' //右上角
+                    ,anim: 5
+                    ,shadeClose: true
+                });
+            }
+        });
+
+        //上传文件
+        upload.render({
+            elem: '#uploadFile'
+            ,url: '/competition/upload/file'
+            ,headers: {token: localStorage.getItem("token")}
+            ,accept: 'file'
+            ,done: function(res){
+                layer.msg(res.msg);
+                ids.push(res.data.id);
+            }
+            ,error() {
+                layer.msg('上传失败');
+            }
+        });
+
+    });
+
+    // 发布比赛公告
+    function publish() {
+        if ($('#title').val() === '' || $('#content').val() === '') {
+            layer.msg("请填写标题或内容");
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/competition/saveOrUpdate",
+            contentType: "application/json;charset=utf-8",
+            headers: {token: localStorage.getItem("token")},
+            data: JSON.stringify({
+                'id': $('#mid').val(),
+                'ids': ids,
+                'name': $('#categories').val(),
+                'title': $('#title').val(),
+                'content': $('#content').val(),
+            }),
+            dataType: "json",
+            success: function(res) {
+                if(res.code === 200) {
+                    layer.msg(res.msg, {
+                        time: 1500,
+                        icon: 1
+                    });
+                    setTimeout(function () {
+                        // 跳转到文章列表页面
+                        location.href = "/html/back/back-match-admin.html";
+                    }, 2000);
+                } else {
+                    layer.alert(res.msg, {icon: 2});
+                }
+            }
+        });
+    }
+
+    $(function() {
+        // 异步查询所有比赛类别，把返回的json串拼接到下拉框中
+        $.ajax({
+            type: "GET",
+            url: "/category/list",
+            headers: {token: localStorage.getItem("token")},
+            dataType: "json",
+            success: function(res){
+                if(res.code === 200){
+                    // List<Category>
+                    for (let i = 0; i < res.data.length; i++) {
+                        $('#categories').append("<option value=" + res.data[i].name + ">" + res.data[i].name + "</option>");
+                    }
+                }
+            }
+        });
+
+        function initEditormd() {
+            editormd("test-editor", {
+                height:'380px',
+                syncScrolling : "single",
+                emoji:true,
+                // 启动本地图片上传功能
+                imageUpload: true,
+                watch: true,
+                imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp","zip","rar"],
+                path : "/editormd/lib/",
+                imageUploadURL : "/competition/upload/editorUpload", // 文件提交请求路径
+                saveHTMLToTextarea : true, // 注意3：这个配置，方便post提交表单
+                previewTheme : "dark", // 预览主题样式 黑色
+            });
+        }
+
+        let url = window.location.search;
+        if (url === '') {
+            initEditormd();
+            // $("#content").val("");
+            return;
+        }
+
+        let id = url.slice(url.indexOf("=") + 1);
+        // 异步查询对应比赛公告
+        $('#mid').val(id);
+        $.ajax({
+            type: "GET",
+            url: "/competition/query?id=" + id,
+            headers: {token: localStorage.getItem("token")},
+            dataType: "json",
+            success: function(res) {
+                if(res.code === 200) {
+                    $('#title').val(res.data.title);
+                    // 设置当前比赛公告的比赛类别
+                    $('#categories').children('option').each(function () {
+                        if($(this).val() === res.data.categoryName) {
+                            $(this).prop('selected', true);
+                        }
+                    });
+                    initEditormd();
+                    $('#content').val(res.data.content);
+                }
+            }
+        });
+    });
+
+    $("#logout").click(function(){
+        localStorage.removeItem("token");
+        window.location.replace("/html/back/back-login.html");
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+package com.ccww.aiotlab.common.utils;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
+
+public class PathUtils {
+
+    public static String generateFilePath(String type, String prePath, String fileName) {
+        // 根据日期生成路径   2022/1/15/
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd/");
+        String datePath = sdf.format(new Date());
+        File file = new File(prePath, datePath);
+        if(!file.exists()) {
+            // 创建带层级的目录 mkdir:只能创建一级目录
+            file.mkdirs();
+        }
+        if ("img".equals(type)) {
+            // uuid作为文件名
+            String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+            // 后缀和文件后缀一致
+            int index = fileName.lastIndexOf(".");
+            // test.jpg -> .jpg
+            String fileType = fileName.substring(index);
+            return new StringBuilder().append(prePath).append("/").append(datePath).append(uuid).append(fileType).toString();
+        }
+        return new  StringBuilder().append(prePath).append("/").append(datePath).append(fileName).toString();
+    }
+}

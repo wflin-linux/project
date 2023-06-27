@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ccww.aiotlab.mapper.CompetitionMapper">
+
+    <resultMap id="competitionBackVoMap" type="com.ccww.aiotlab.entity.vo.CompetitionBackVo">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="category_name" jdbcType="VARCHAR" property="categoryName"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="creator" jdbcType="VARCHAR" property="creator"/>
+    </resultMap>
+
+    <select id="selectByAll" resultMap="competitionBackVoMap">
+        SELECT c.id,title,category_name,c.create_time,u.real_name AS creator
+        FROM competition c
+        JOIN `user` u
+        ON c.creator=u.id
+        LIMIT #{page},#{limit}
+    </select>
+
+</mapper>

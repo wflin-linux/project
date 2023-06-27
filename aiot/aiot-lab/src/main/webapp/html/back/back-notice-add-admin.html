@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>aiot实验室后台管理</title>
+    <link rel="stylesheet" href="/layui/css/layui.css">
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo layui-hide-xs layui-bg-black">aiot实验室</div>
+        <!-- 头部区域（可配合layui 已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left">
+            <!-- 移动端显示 -->
+            <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
+                <i class="layui-icon layui-icon-spread-left"></i>
+            </li>
+        </ul>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item layui-hide layui-show-md-inline-block">
+                <a href="javascript:;">
+                    <img src="//tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg"
+                         class="layui-nav-img">
+                    tester
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="#" id="logout">退出登录</a></dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                <li class="layui-nav-item" style="margin-top: 5%"><a href="/html/back/back-user-admin.html">用户管理</a>
+                </li>
+                <li class="layui-nav-item"><a href="/html/back/back-register-admin.html">注册管理</a></li>
+                <li class="layui-nav-item">
+                    <a href="/html/back/back-match-admin.html">比赛管理</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="/html/back/back-match-add-admin.html">添加比赛公告</a></dd>
+                        <dd><a href="/html/back/back-match-category-admin.html">类别管理</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a href="/html/back/back-notice-admin.html">公告管理</a>
+                    <dl class="layui-nav-child">
+                        <dd class="layui-this"><a href="/html/back/back-notice-add-admin.html">添加公告</a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-body">
+        <!-- 内容主体区域 -->
+        <div style="padding: 15px;">
+            <form
+                  id="fromData" enctype="multipart/form-data" onsubmit="return false;"
+            >
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label">文本域</label>
+                    <div class="layui-input-block">
+                        <textarea placeholder="请输入内容" lay-verify="announcement" class="layui-textarea"
+                                  name="announcement" id="announcement"></textarea>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">公告图片</label>
+                    <div class="layui-input-block">
+                        <input type="file" lay-verify="images" multiple id="images" name="images"/>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn"  onclick="submitForm()">立即提交</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="/js/jquery-3.6.0.min.js"></script>
+<script src="/layui/layui.js"></script>
+
+<script>
+    layui.use(['form', 'layedit', 'laydate'], function () {
+        var form = layui.form
+            , layer = layui.layer
+            , layedit = layui.layedit
+
+        //自定义验证规则
+        form.verify({
+            announcement: function (value) {
+                if (value.length < 3) {
+                    return "文字描述至少3个字符"
+                }
+            }
+            , images: function (value) {
+                if (value == "") {
+                    return '图片至少一张'
+                }
+            }
+        });
+
+    })
+
+    //监听提交
+    function submitForm() {
+        var files = $('#images')
+        var formData = new FormData()
+        for (var i = 0; i < files[0].files.length; i++) {
+            formData.append("file", files[0].files[i]);
+        }
+        formData.append("announcement", $('#announcement').val())
+        $.ajax({
+            url: "/announce",
+            type: "POST",
+            headers: {token: localStorage.getItem("token")},
+            data: formData,
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if(result.code==200){
+                    layer.msg(result.msg, {
+                        icon: 1,
+                        time: 1000 //2秒关闭（如果不配置，默认是3秒）
+                    },function(){
+                       window.location.replace("./back-notice-admin.html");
+                    });
+                }
+            },
+            error: function (a, b, c) {
+                console.log("失败了");
+            },
+            complete: function () {
+                console.log("请求最后处理的方法");
+            },
+        })
+    }
+</script>
+<script>
+    $("#logout").click(function () {
+        localStorage.removeItem("token");
+        window.location.replace("/html/back/back-login.html");
+    })
+</script>
+</body>
+</html>
